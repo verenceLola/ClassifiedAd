@@ -1,22 +1,14 @@
-using System;
-using System.Threading.Tasks;
 using MarketPlace.Domain.Interfaces;
 using MarketPlace.Domain.Entities;
-using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
+using MarketPlace.Framework;
+using Raven.Client.Documents.Session;
 
 namespace Marketplace.Infrastructure
 {
-    public class ClassifiedAdRepository : IClassifiedAdRepository
+    public class ClassifiedAdRepository : RavenDBRepository<ClassfiedAd, ClassfiedAdId>, IClassifiedAdRepository
     {
-        private readonly ClassifiedAdDbContext _dbContext;
-        public ClassifiedAdRepository(ClassifiedAdDbContext dbContext) =>
-            _dbContext = dbContext;
 
-        public async Task Add(ClassfiedAd entity) =>
-             await _dbContext.ClassfiedAds.AddAsync(entity);
-        public async Task<bool> Exists(ClassfiedAdId id) =>
-             await _dbContext.ClassfiedAds.FindAsync(id.Value) != null;
-        public async Task<ClassfiedAd> Load(ClassfiedAdId id) =>
-            await _dbContext.ClassfiedAds.FindAsync(id.Value);
+        public ClassifiedAdRepository(IAsyncDocumentSession session) : base(session, id => $"ClassifiedAd/{id.Value.ToString()}") { }
     }
 }

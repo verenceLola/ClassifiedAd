@@ -1,7 +1,7 @@
 using System;
 using MarketPlace.Framework;
 
-namespace MarketPlace.Domain.ValueObjects
+namespace MarketPlace.Domain.ValueObjects.ClasifiedAd
 {
     public class ClassfiedAdId : Value<ClassfiedAdId>
     {
@@ -16,6 +16,8 @@ namespace MarketPlace.Domain.ValueObjects
             Value = value;
         }
         public static implicit operator Guid(ClassfiedAdId self) => self.Value;
+        public static implicit operator ClassfiedAdId(string value) =>
+            new ClassfiedAdId(Guid.Parse(value));
         public ClassfiedAdId() { }
     }
 }

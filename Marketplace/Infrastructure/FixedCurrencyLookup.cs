@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
-using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 using MarketPlace.Domain.Services.Interfaces;
 
 namespace Marketplace.Infrastructure

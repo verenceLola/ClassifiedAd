@@ -1,7 +1,7 @@
 using System;
 using Xunit;
 
-using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 using MarketPlace.Domain.Services.Interfaces;
 using MarketPlace.Domain.Exceptions;
 

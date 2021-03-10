@@ -1,6 +1,6 @@
 using System;
 
-namespace MarketPlace.Domain.Events
+namespace MarketPlace.Domain.Events.ClassifiedAdEvents
 {
     public class ClassifiedAdCreated
     {

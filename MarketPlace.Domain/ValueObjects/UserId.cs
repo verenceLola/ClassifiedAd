@@ -15,6 +15,7 @@ namespace MarketPlace.Domain.ValueObjects
             Value = value;
         }
         public static implicit operator Guid(UserId self) => self.Value;
+        public static implicit operator UserId(string value) => new UserId(Guid.Parse(value));
         protected UserId() { }
     }
 }

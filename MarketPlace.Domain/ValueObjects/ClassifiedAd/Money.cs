@@ -3,7 +3,7 @@ using MarketPlace.Framework;
 using MarketPlace.Domain.Exceptions;
 using MarketPlace.Domain.Services.Interfaces;
 
-namespace MarketPlace.Domain.ValueObjects
+namespace MarketPlace.Domain.ValueObjects.ClasifiedAd
 {
     public class Money : Value<Money>
     {

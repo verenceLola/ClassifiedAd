@@ -1,6 +1,6 @@
 using System;
-using MarketPlace.Domain.ValueObjects;
-using MarketPlace.Domain.Events;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
+using MarketPlace.Domain.Events.ClassifiedAdEvents;
 
 namespace MarketPlace.Domain.Entities
 {
@@ -15,7 +15,7 @@ namespace MarketPlace.Domain.Entities
         {
             switch (@event)
             {
-                case Events.PictureAddedToAClassifiedAd e:
+                case PictureAddedToAClassifiedAd e:
                     Id = new PictureId(e.PictureId);
                     Location = new Uri(e.Url);
                     Size = new PictureSize
@@ -25,7 +25,7 @@ namespace MarketPlace.Domain.Entities
                     };
                     Order = e.Order;
                     break;
-                case Events.ClassifiedAdPictureResized e:
+                case ClassifiedAdPictureResized e:
                     Size = new PictureSize
                     {
                         Height = e.Height,

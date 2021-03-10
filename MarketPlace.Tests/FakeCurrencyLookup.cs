@@ -1,7 +1,7 @@
 using System.Linq;
 using System.Collections.Generic;
 using MarketPlace.Domain.Services.Interfaces;
-using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 
 namespace MarketPlace.Tests
 {

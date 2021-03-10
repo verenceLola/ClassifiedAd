@@ -1,4 +1,4 @@
-using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 
 namespace MarketPlace.Domain.Services.Interfaces
 {

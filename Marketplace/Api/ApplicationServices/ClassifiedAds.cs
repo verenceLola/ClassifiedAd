@@ -3,6 +3,7 @@ using System.Threading.Tasks;
 using MarketPlace.Domain.Services.Interfaces;
 using MarketPlace.Domain.Entities;
 using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 using MarketPlace.Domain.Interfaces;
 using MarketPlace.Framework;
 
@@ -31,7 +32,7 @@ namespace Marketplace.Api.ApplicationServices
             };
         public async Task HandleCreate(Contracts.ClassifiedAds.V1.Create cmd)
         {
-            if (await _repository.Exists(new ClassfiedAdId(cmd.Id)))
+            if (await _repository.Exists(cmd.Id.ToString()))
             {
                 throw new InvalidOperationException($"Entity with id {cmd.Id} already exists");
             }
@@ -45,7 +46,7 @@ namespace Marketplace.Api.ApplicationServices
         }
         public async Task HandleUpdate(Guid classifiedAdId, Action<ClassfiedAd> operation)
         {
-            var classfiedAd = await _repository.Load(new ClassfiedAdId(classifiedAdId));
+            var classfiedAd = await _repository.Load(classifiedAdId.ToString());
             if (classfiedAd == null)
             {
                 throw new InvalidOperationException($"Entity with id {classifiedAdId} cannot be found");

@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using MarketPlace.Domain.Entities;
-using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 
 
 namespace MarketPlace.Domain.Interfaces

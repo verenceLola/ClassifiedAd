@@ -5,7 +5,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 
-using Microsoft.EntityFrameworkCore;
+using Raven.Client.Documents;
 using Marketplace.Api.ApplicationServices;
 using MarketPlace.Domain.Interfaces;
 using MarketPlace.Domain.Services.Interfaces;
@@ -25,18 +25,28 @@ namespace Marketplace
         private IWebHostEnvironment Environment { get; }
         public void ConfigureServices(IServiceCollection services)
         {
-            const string connetionString =
-                @"Host=localhost;Database=Marketplace_Chapter8;
-                Username=ddd;Password=book";
+            var purgomalumClient = new Infrastructure.PurgomalumClient();
+            var store = new DocumentStore
+            {
+                Urls = new[] { "http://localhost:8080" },
+                Database = "Marketplace_Chapter8",
+                Conventions =
+                  {
+                      FindIdentityProperty = x => x.Name == "DbId"
+                  }
+            };
+            store.Initialize();
 
-            services.AddEntityFrameworkNpgsql()
-                .AddDbContext<Infrastructure.ClassifiedAdDbContext>(
-                    options => options.UseNpgsql(connetionString)
-                );
+            services.AddScoped(c => store.OpenAsyncSession());
+            services.AddScoped<IClassifiedAdRepository, Infrastructure.ClassifiedAdRepository>();
+            services.AddScoped<IUserProfileRepository, Infrastructure.UserProfileRepository>();
             services.AddSingleton<IcurrencyLookup, Infrastructure.FixedCurrencyLookup>();
-            services.AddScoped<IUnitOfWork, Infrastructure.EfCoreUnitOfWork>();
+            services.AddScoped<IUnitOfWork, Infrastructure.RavenDbUnitOfWork>();
             services.AddScoped<IClassifiedAdRepository, Infrastructure.ClassifiedAdRepository>();
             services.AddScoped<Api.ApplicationServices.Interfaces.IApplicationService, ClassfiedAdApplicationService>();
+            services.AddScoped(c =>
+                new UserProfileApplicationService(c.GetService<IUserProfileRepository>(), c.GetService<IUnitOfWork>(),
+                text => purgomalumClient.CheckForProfanity(text).GetAwaiter().GetResult()));
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddSwaggerGen(c =>
@@ -53,7 +63,6 @@ namespace Marketplace
                 app.UseDeveloperExceptionPage();
             }
 
-            app.EnsureDatabase();
             app.UseMvcWithDefaultRoute();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClassfiedAds v1"));

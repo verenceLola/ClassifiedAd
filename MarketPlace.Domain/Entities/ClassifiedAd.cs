@@ -1,5 +1,6 @@
 using System;
 using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 using MarketPlace.Domain.Exceptions;
 using MarketPlace.Framework;
 using MarketPlace.Domain.Extensions;
@@ -11,7 +12,6 @@ namespace MarketPlace.Domain.Entities
     public class ClassfiedAd : AggregateRoot<ClassfiedAdId>
     {
         public UserId OwnerId { get; private set; }
-        public Guid ClassifiedAdId { get; private set; }
         public UserId ApprovedBy { get; private set; }
         public ClassfiedAdTitle Title { get; private set; }
         public ClassfiedAdText Text { get; private set; }
@@ -26,24 +26,24 @@ namespace MarketPlace.Domain.Entities
         public ClassfiedAd(ClassfiedAdId id, UserId ownerId)
         {
             Pictures = new List<Picture>();
-            Apply(new Events.ClassifiedAdCreated
+            Apply(new Events.ClassifiedAdEvents.ClassifiedAdCreated
             {
                 Id = id,
                 OwnerId = ownerId
             });
         }
         protected ClassfiedAd() { }
-        public void SetTitle(ClassfiedAdTitle title) => Apply(new Events.ClassifiedAdTitleChanged
+        public void SetTitle(ClassfiedAdTitle title) => Apply(new Events.ClassifiedAdEvents.ClassifiedAdTitleChanged
         {
             Id = Id,
             Title = title
         });
-        public void UpdateText(ClassfiedAdText text) => Apply(new Events.ClassfiedAdTextUpdated
+        public void UpdateText(ClassfiedAdText text) => Apply(new Events.ClassifiedAdEvents.ClassfiedAdTextUpdated
         {
             Id = Id,
             AdText = text
         });
-        public void UpdatePrice(Price price) => Apply(new Events.ClassfiedAdPriceUpdated
+        public void UpdatePrice(Price price) => Apply(new Events.ClassifiedAdEvents.ClassfiedAdPriceUpdated
         {
             Price = price.Amount,
             CurrencyCode = price.Currency.CurrencyCode,
@@ -53,7 +53,7 @@ namespace MarketPlace.Domain.Entities
         {
             PendingReview, Active, Inactive, MarkedAsSold
         };
-        public void RequestToPublish() => Apply(new Events.ClassifiedAdSentForReview
+        public void RequestToPublish() => Apply(new Events.ClassifiedAdEvents.ClassifiedAdSentForReview
         {
             Id = Id
         });
@@ -72,7 +72,7 @@ namespace MarketPlace.Domain.Entities
                 throw new InvalidEntityStateException(this, $"Post-checks failed in state {State}");
             }
         }
-        public void AddPicture(Uri pictureUri, PictureSize size) => Apply(new Events.PictureAddedToAClassifiedAd
+        public void AddPicture(Uri pictureUri, PictureSize size) => Apply(new Events.ClassifiedAdEvents.PictureAddedToAClassifiedAd
         {
             PictureId = new Guid(),
             ClassifiedAdId = Id,
@@ -98,27 +98,27 @@ namespace MarketPlace.Domain.Entities
         {
             switch (@event)
             {
-                case Events.ClassifiedAdCreated e:
+                case Events.ClassifiedAdEvents.ClassifiedAdCreated e:
                     Id = new ClassfiedAdId(e.Id);
                     OwnerId = new UserId(e.OwnerId);
                     State = ClassifiedAdState.Inactive;
                     break;
-                case Events.ClassfiedAdPriceUpdated e:
+                case Events.ClassifiedAdEvents.ClassfiedAdPriceUpdated e:
                     Id = new ClassfiedAdId(e.Id);
                     Price = new Price(e.Price, e.CurrencyCode);
                     break;
-                case Events.ClassfiedAdTextUpdated e:
+                case Events.ClassifiedAdEvents.ClassfiedAdTextUpdated e:
                     Id = new ClassfiedAdId(e.Id);
                     Text = new ClassfiedAdText(e.AdText);
                     break;
-                case Events.ClassifiedAdTitleChanged e:
+                case Events.ClassifiedAdEvents.ClassifiedAdTitleChanged e:
                     Id = new ClassfiedAdId(e.Id);
                     Title = new ClassfiedAdTitle(e.Title);
                     break;
-                case Events.ClassifiedAdSentForReview e:
+                case Events.ClassifiedAdEvents.ClassifiedAdSentForReview e:
                     State = ClassifiedAdState.PendingReview;
                     break;
-                case Events.PictureAddedToAClassifiedAd e:
+                case Events.ClassifiedAdEvents.PictureAddedToAClassifiedAd e:
                     var newPicture = new Picture(Apply);
                     Pictures.Add(newPicture);
                     break;

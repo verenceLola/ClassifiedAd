@@ -1,6 +1,6 @@
 using MarketPlace.Framework;
 
-namespace MarketPlace.Domain.ValueObjects
+namespace MarketPlace.Domain.ValueObjects.ClasifiedAd
 {
     public class CurrencyDetails : Value<CurrencyDetails>
     {

@@ -4,6 +4,7 @@ using Xunit;
 using MarketPlace.Domain.Entities;
 using MarketPlace.Domain.ValueObjects;
 using MarketPlace.Domain.Exceptions;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 
 namespace MarketPlace.Tests
 {
