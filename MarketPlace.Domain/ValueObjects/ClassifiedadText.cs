@@ -12,7 +12,7 @@ namespace MarketPlace.Domain.ValueObjects
             return new ClassfiedAdText(text);
         }
         internal ClassfiedAdText(string text) => Value = text;
-        public readonly string Value;
+        public string Value { get; private set; }
         public static implicit operator String(ClassfiedAdText self) => self.Value;
         private static void CheckValidity(string text)
         {
@@ -21,5 +21,6 @@ namespace MarketPlace.Domain.ValueObjects
                 throw new ArgumentException(nameof(text), "Text must be specified");
             }
         }
+        protected ClassfiedAdText() { }
     }
 }

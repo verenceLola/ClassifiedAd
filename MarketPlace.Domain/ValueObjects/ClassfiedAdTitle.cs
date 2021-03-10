@@ -12,8 +12,9 @@ namespace MarketPlace.Domain.ValueObjects
 
             return new ClassfiedAdTitle(title);
         }
-        public readonly string Value;
+        public string Value { get; private set; }
         internal ClassfiedAdTitle(string value) => Value = value;
+        protected ClassfiedAdTitle() { }
         public static implicit operator String(ClassfiedAdTitle self) => self.Value;
         private static void CheckValidity(string value)
         {

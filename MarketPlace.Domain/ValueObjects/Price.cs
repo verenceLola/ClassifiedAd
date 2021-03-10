@@ -13,7 +13,8 @@ namespace MarketPlace.Domain.ValueObjects
                 throw new ArgumentException("Price cannot be negative", nameof(amount));
             }
         }
-        internal Price(decimal amount, string currencyCode): base(amount, new CurrencyDetails {CurrencyCode = currencyCode}) {}
+        internal Price(decimal amount, string currencyCode) : base(amount, new CurrencyDetails { CurrencyCode = currencyCode }) { }
         public new static Price FromDecimal(decimal amount, string currency, IcurrencyLookup currencyLookup) => new Price(amount, currency, currencyLookup);
+        protected Price() { }
     }
 }

@@ -1,22 +1,36 @@
+using System;
 using MarketPlace.Domain.ValueObjects;
 using MarketPlace.Domain.Exceptions;
+using MarketPlace.Framework;
+using MarketPlace.Domain.Extensions;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace MarketPlace.Domain.Entities
 {
-    public class ClassfiedAd : BaseEntity
+    public class ClassfiedAd : AggregateRoot<ClassfiedAdId>
     {
-        public ClassfiedAdId Id { get; private set; }
         public UserId OwnerId { get; private set; }
         public UserId ApprovedBy { get; private set; }
         public ClassfiedAdTitle Title { get; private set; }
         public ClassfiedAdText Text { get; private set; }
         public Price Price { get; private set; }
         public ClassifiedAdState State { get; private set; }
-        public ClassfiedAd(ClassfiedAdId id, UserId ownerId) => Apply(new Events.ClassifiedAdCreated
+        public List<Picture> Pictures { get; private set; }
+        private string DbId
         {
-            Id = id,
-            OwnerId = ownerId
-        });
+            get => $"ClassifiedAd/{Id.Value}";
+            set {}
+        }
+        public ClassfiedAd(ClassfiedAdId id, UserId ownerId)
+        {
+            Pictures = new List<Picture>();
+            Apply(new Events.ClassifiedAdCreated
+            {
+                Id = id,
+                OwnerId = ownerId
+            });
+        }
         public void SetTitle(ClassfiedAdTitle title) => Apply(new Events.ClassifiedAdTitleChanged
         {
             Id = Id,
@@ -46,8 +60,8 @@ namespace MarketPlace.Domain.Entities
         {
             bool valid = Id != null && OwnerId != null && (State switch
             {
-                ClassifiedAdState.PendingReview => Title != null && Text != null && Price?.Amount > 0,
-                ClassifiedAdState.Active => Title != null && Text != null && Price?.Amount > 0 && ApprovedBy != null,
+                ClassifiedAdState.PendingReview => Title != null && Text != null && Price?.Amount > 0 && FirstPicture.HasCorrectSize(),
+                ClassifiedAdState.Active => Title != null && Text != null && Price?.Amount > 0 && FirstPicture.HasCorrectSize() && ApprovedBy != null,
                 _ => true
             });
 
@@ -56,6 +70,28 @@ namespace MarketPlace.Domain.Entities
                 throw new InvalidEntityStateException(this, $"Post-checks failed in state {State}");
             }
         }
+        public void AddPicture(Uri pictureUri, PictureSize size) => Apply(new Events.PictureAddedToAClassifiedAd
+        {
+            PictureId = new Guid(),
+            ClassifiedAdId = Id,
+            Url = pictureUri.ToString(),
+            Height = size.Height,
+            Width = size.Width,
+            Order = Pictures.Max(x => x.Order)
+        });
+        public void ResizePicture(PictureId pictureId, PictureSize newSize)
+        {
+            var picture = FindPicture(pictureId);
+
+            if (picture == null)
+            {
+                throw new InvalidOperationException("Cannot resize a picture that I don't have");
+            }
+
+            picture.Resize(newSize);
+        }
+        private Picture FindPicture(PictureId id) => Pictures.FirstOrDefault(x => x.Id == id);
+        private Picture FirstPicture => Pictures.OrderBy(x => x.Order).FirstOrDefault();
         protected override void When(object @event)
         {
             switch (@event)
@@ -79,6 +115,10 @@ namespace MarketPlace.Domain.Entities
                     break;
                 case Events.ClassifiedAdSentForReview e:
                     State = ClassifiedAdState.PendingReview;
+                    break;
+                case Events.PictureAddedToAClassifiedAd e:
+                    var newPicture = new Picture(Apply);
+                    Pictures.Add(newPicture);
                     break;
             }
         }

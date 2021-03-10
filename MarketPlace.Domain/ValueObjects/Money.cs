@@ -7,9 +7,8 @@ namespace MarketPlace.Domain.ValueObjects
 {
     public class Money : Value<Money>
     {
-        public decimal Amount { get; }
-        private const string DefaultCurrency = "EUR";
-        public CurrencyDetails Currency { get; }
+        public decimal Amount { get; private set; }
+        public CurrencyDetails Currency { get; private set;}
         protected Money(decimal amount, string currencyCode, IcurrencyLookup currencyLookup)
         {
             if (string.IsNullOrEmpty(currencyCode))
@@ -38,6 +37,7 @@ namespace MarketPlace.Domain.ValueObjects
             Amount = amount;
             Currency = currency;
         }
+        protected Money() { }
         public Money Add(Money summand)
         {
             if (summand.Currency != Currency)
