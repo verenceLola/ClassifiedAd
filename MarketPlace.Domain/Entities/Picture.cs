@@ -1,6 +1,4 @@
 using System;
-using System.Collections.Generic;
-using MarketPlace.Framework;
 using MarketPlace.Domain.ValueObjects;
 using MarketPlace.Domain.Events;
 
@@ -8,9 +6,11 @@ namespace MarketPlace.Domain.Entities
 {
     public class Picture : BaseEntity<PictureId>
     {
-        internal PictureSize Size { get; set; }
+        public PictureSize Size { get; private set; }
         internal Uri Location { get; set; }
         internal int Order { get; set; }
+        public Guid PictureId { get => Id.Value; set{ } }
+        public ClassfiedAdId ParentId { get; private set; }
         protected override void When(object @event)
         {
             switch (@event)
@@ -41,10 +41,8 @@ namespace MarketPlace.Domain.Entities
             Width = newSize.Width,
             PictureId = Id.Value
         });
-        protected override void EnsureValidState()
-        {
-            throw new NotImplementedException();
-        }
+        protected override void EnsureValidState() { }
+        public Picture() { }
     }
 
 }

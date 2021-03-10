@@ -5,7 +5,7 @@ namespace MarketPlace.Domain.ValueObjects
 {
     public class UserId : Value<UserId>
     {
-        public readonly Guid Value;
+        public Guid Value { get; internal set; }
         public UserId(Guid value)
         {
             if (value == default)
@@ -15,5 +15,6 @@ namespace MarketPlace.Domain.ValueObjects
             Value = value;
         }
         public static implicit operator Guid(UserId self) => self.Value;
+        protected UserId() { }
     }
 }

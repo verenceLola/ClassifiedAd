@@ -5,7 +5,7 @@ namespace MarketPlace.Domain.ValueObjects
 {
     public class ClassfiedAdId : Value<ClassfiedAdId>
     {
-        public readonly Guid Value;
+        public Guid Value { get; internal set; }
         public ClassfiedAdId(Guid value)
         {
             if (value == default)
@@ -16,5 +16,6 @@ namespace MarketPlace.Domain.ValueObjects
             Value = value;
         }
         public static implicit operator Guid(ClassfiedAdId self) => self.Value;
+        public ClassfiedAdId() { }
     }
 }

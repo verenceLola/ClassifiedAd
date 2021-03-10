@@ -11,6 +11,7 @@ namespace MarketPlace.Domain.Entities
     public class ClassfiedAd : AggregateRoot<ClassfiedAdId>
     {
         public UserId OwnerId { get; private set; }
+        public Guid ClassifiedAdId { get; private set; }
         public UserId ApprovedBy { get; private set; }
         public ClassfiedAdTitle Title { get; private set; }
         public ClassfiedAdText Text { get; private set; }
@@ -20,7 +21,7 @@ namespace MarketPlace.Domain.Entities
         private string DbId
         {
             get => $"ClassifiedAd/{Id.Value}";
-            set {}
+            set { }
         }
         public ClassfiedAd(ClassfiedAdId id, UserId ownerId)
         {
@@ -31,6 +32,7 @@ namespace MarketPlace.Domain.Entities
                 OwnerId = ownerId
             });
         }
+        protected ClassfiedAd() { }
         public void SetTitle(ClassfiedAdTitle title) => Apply(new Events.ClassifiedAdTitleChanged
         {
             Id = Id,

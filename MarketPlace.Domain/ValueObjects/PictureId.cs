@@ -7,5 +7,6 @@ namespace MarketPlace.Domain.ValueObjects
     {
         public PictureId(Guid value) => Value = value;
         public Guid Value { get; }
+        public PictureId() { }
     }
 }
