@@ -24,5 +24,22 @@ namespace Marketplace.Infrastructure
                 return new BadRequestObjectResult(new { error = e.Message, stackTrace = e.StackTrace });
             }
         }
+        public static async Task<IActionResult> HandleQuery<TModel>(Func<Task<TModel>> query, ILogger logger)
+        {
+            try
+            {
+                return new OkObjectResult(await query());
+            }
+            catch (Exception e)
+            {
+                logger.Error(e, "Error handling the query");
+
+                return new BadRequestObjectResult(new
+                {
+                    error = e.Message,
+                    stackTrace = e.StackTrace
+                });
+            }
+        }
     }
 }
