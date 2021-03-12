@@ -21,9 +21,7 @@ namespace Marketplace
                     Title = x.Title.Value,
                     CurrencyCode = x.Price.Currency.CurrencyCode
                 })
-                .Skip(query.Page * query.PageSize)
-                .Take(query.PageSize)
-                .ToListAsync();
+                .PagedList(query.Page, query.PageSize);
 
         public static Task<List<ReadModels.ClassifiedAds.PublicClassifiedAdListItem>> Query(this IAsyncDocumentSession session, QueryModels.GetOwnersClassifiedAds query)
             => session.Query<ClassfiedAd>()
