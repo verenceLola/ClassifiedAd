@@ -1,6 +1,6 @@
 using System;
 
-namespace Marketplace.QueryModels
+namespace MarketPlace.QueryModels
 {
     public class GetPublishedClassifiedAds
     {

@@ -6,7 +6,7 @@ using MarketPlace.Domain.Interfaces;
 using Raven.Client.Documents.Session;
 
 
-namespace Marketplace.Infrastructure
+namespace MarketPlace.Infrastructure
 {
     public class UserProfileRepository : RavenDBRepository<UserProfile, UserId>, IUserProfileRepository
     {

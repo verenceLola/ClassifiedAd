@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Marketplace.Contracts.UserProfile
+namespace MarketPlace.Contracts.UserProfile
 {
     public class UpdateUserFullName
     {

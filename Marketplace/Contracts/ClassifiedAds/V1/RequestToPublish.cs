@@ -1,7 +1,7 @@
 using System;
 
 
-namespace Marketplace.Contracts.ClassifiedAds.V1
+namespace MarketPlace.Contracts.ClassifiedAds.V1
 {
     public class RequestToPublish
     {

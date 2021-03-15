@@ -23,6 +23,7 @@ namespace MarketPlace.Domain.Entities
                 FullName = fullName,
                 DisplayName = displayName
             });
+        protected UserProfile() { }
 
         public void UpdateFullName(FullName fullName) => Apply(new userFullNameChanged
         {

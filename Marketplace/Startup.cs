@@ -4,15 +4,15 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-
-using Raven.Client.Documents;
-using Marketplace.Api.ApplicationServices;
+using System.Collections.Generic;
+using MarketPlace.Services.ApplicationServices;
 using MarketPlace.Domain.Interfaces;
 using MarketPlace.Domain.Services.Interfaces;
 using MarketPlace.Framework;
+using EventStore.ClientAPI;
 
 
-namespace Marketplace
+namespace MarketPlace
 {
     public class Startup
     {
@@ -26,27 +26,34 @@ namespace Marketplace
         public void ConfigureServices(IServiceCollection services)
         {
             var purgomalumClient = new Infrastructure.PurgomalumClient();
-            var store = new DocumentStore
-            {
-                Urls = new[] { "http://localhost:8080" },
-                Database = "Marketplace_Chapter8",
-                Conventions =
-                  {
-                      FindIdentityProperty = x => x.Name == "DbId"
-                  }
-            };
-            store.Initialize();
 
-            services.AddScoped(c => store.OpenAsyncSession());
-            services.AddScoped<IClassifiedAdRepository, Infrastructure.ClassifiedAdRepository>();
-            services.AddScoped<IUserProfileRepository, Infrastructure.UserProfileRepository>();
+            var esConnection = EventStoreConnection.Create(
+                Configuration.GetConnectionString("EventStore"),
+                ConnectionSettings.Create().KeepReconnecting(),
+                Environment.ApplicationName
+            );
+
+            var store = new Infrastructure.EsAggregateStore(esConnection);
+            var classfiedAdDetails = new List<ReadModels.ClassifiedAds.ClassfiedAdDetails>();
+            var userDetails = new List<ReadModels.UserDetails.UserDetails>();
+
+            services.AddSingleton<IEnumerable<ReadModels.UserDetails.UserDetails>>(userDetails);
+            services.AddSingleton<IEnumerable<ReadModels.ClassifiedAds.ClassfiedAdDetails>>(classfiedAdDetails);
+            services.AddSingleton(esConnection);
+            services.AddSingleton<IAggregateStore>(store);
+
+            IProjection[] projections = {
+                new Projections.ClassifiedAdDetailProjection(classfiedAdDetails),
+                new Projections.UserDetailsProjection(userDetails)
+            };
+
+            var projectionManager = new Infrastructure.ProjectionManager(esConnection, projections);
+            services.AddSingleton<IHostedService>(new EventStoreService(esConnection, projectionManager));
             services.AddSingleton<IcurrencyLookup, Infrastructure.FixedCurrencyLookup>();
-            services.AddScoped<IUnitOfWork, Infrastructure.RavenDbUnitOfWork>();
-            services.AddScoped<IClassifiedAdRepository, Infrastructure.ClassifiedAdRepository>();
-            services.AddScoped<Api.ApplicationServices.Interfaces.IApplicationService, ClassfiedAdApplicationService>();
-            services.AddScoped(c =>
-                new UserProfileApplicationService(c.GetService<IUserProfileRepository>(), c.GetService<IUnitOfWork>(),
-                text => purgomalumClient.CheckForProfanity(text).GetAwaiter().GetResult()));
+            services.AddScoped<Services.ApplicationServices.Interfaces.IApplicationService, ClassfiedAdApplicationService>();
+            services.AddSingleton(new UserProfileApplicationService(
+                store, text => purgomalumClient.CheckForProfanity(text).GetAwaiter().GetResult()));
+
 
             services.AddMvc(options => options.EnableEndpointRouting = false);
             services.AddSwaggerGen(c =>

@@ -2,14 +2,14 @@ using System.Threading.Tasks;
 using Serilog;
 using Microsoft.AspNetCore.Mvc;
 
-namespace Marketplace.Api.Commands
+namespace MarketPlace.Api.Commands
 {
     [Route("/profile")]
     public class UserProfileApiCommands : Controller
     {
-        private readonly ApplicationServices.Interfaces.IApplicationService _applicationService;
+        private readonly Services.ApplicationServices.Interfaces.IApplicationService _applicationService;
         private readonly static ILogger Log = Serilog.Log.ForContext<UserProfileApiCommands>();
-        public UserProfileApiCommands(ApplicationServices.UserProfileApplicationService applicationService)
+        public UserProfileApiCommands(Services.ApplicationServices.UserProfileApplicationService applicationService)
         {
             _applicationService = applicationService;
         }

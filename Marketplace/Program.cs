@@ -5,8 +5,10 @@ using Microsoft.Extensions.DependencyInjection;
 using System.IO;
 using static System.Reflection.Assembly;
 using static System.Environment;
+using Serilog;
 
-namespace Marketplace
+
+namespace MarketPlace
 {
     public class Program
     {
@@ -14,6 +16,10 @@ namespace Marketplace
         public static void Main(string[] args)
         {
             var configuration = BuildConfiguration(args);
+            Log.Logger = new LoggerConfiguration()
+                .MinimumLevel.Debug()
+                .WriteTo.Console()
+                .CreateLogger();
             ConfigureWebHost(configuration).Build().Run();
         }
 
@@ -25,6 +31,9 @@ namespace Marketplace
             .UseKestrel();
 
         private static IConfiguration BuildConfiguration(string[] args) =>
-            new ConfigurationBuilder().SetBasePath(CurrentDirectory).Build();
+            new ConfigurationBuilder()
+            .SetBasePath(CurrentDirectory)
+            .AddJsonFile("appsettings.Development.json", false, true)
+            .Build();
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 using Serilog;
 
 
-namespace Marketplace.Infrastructure
+namespace MarketPlace.Infrastructure
 {
     public static class RequestHandler
     {
@@ -24,11 +24,11 @@ namespace Marketplace.Infrastructure
                 return new BadRequestObjectResult(new { error = e.Message, stackTrace = e.StackTrace });
             }
         }
-        public static async Task<IActionResult> HandleQuery<TModel>(Func<Task<TModel>> query, ILogger logger)
+        public static IActionResult HandleQuery<TModel>(Func<TModel> query, ILogger logger)
         {
             try
             {
-                return new OkObjectResult(await query());
+                return new OkObjectResult(query());
             }
             catch (Exception e)
             {

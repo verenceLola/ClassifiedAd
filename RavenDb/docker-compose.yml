@@ -3,7 +3,7 @@ version: '3.5'
 services:
 
   ravendb:
-    container_name: marketplace-ch8-ravendb
+    container_name: MarketPlace-ch8-ravendb
     image: ravendb/ravendb
     ports:
       - 8080:8080

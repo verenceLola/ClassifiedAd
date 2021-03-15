@@ -1,9 +1,9 @@
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using Marketplace.Api.ApplicationServices.Interfaces;
+using MarketPlace.Services.ApplicationServices.Interfaces;
 using Serilog;
 
-namespace Marketplace.Api.ClassifiedAdsCommands
+namespace MarketPlace.Api.ClassifiedAdsCommands
 {
     [Route("/ad")]
     public class ClassifiedAdApiCommands : Controller

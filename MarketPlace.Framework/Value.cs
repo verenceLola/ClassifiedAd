@@ -79,7 +79,7 @@ namespace MarketPlace.Framework
 
         private static IEnumerable<object> GetEnumerableValues(object obj)
         {
-            var enumerator = ((IEnumerable) obj).GetEnumerator();
+            var enumerator = ((IEnumerable)obj).GetEnumerator();
             while (enumerator.MoveNext()) yield return enumerator.Current;
         }
 

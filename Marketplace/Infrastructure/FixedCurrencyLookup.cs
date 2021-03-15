@@ -3,7 +3,7 @@ using System.Linq;
 using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 using MarketPlace.Domain.Services.Interfaces;
 
-namespace Marketplace.Infrastructure
+namespace MarketPlace.Infrastructure
 {
     public class FixedCurrencyLookup : IcurrencyLookup
     {

@@ -1,6 +1,6 @@
 using System;
 
-namespace Marketplace.ReadModels.ClassifiedAds
+namespace MarketPlace.ReadModels.ClassifiedAds
 {
     public class ClassfiedAdDetails
     {
@@ -11,5 +11,6 @@ namespace Marketplace.ReadModels.ClassifiedAds
         public string Description { get; set; }
         public string SellerDisplayName { get; set; }
         public string[] PhotoUrls { get; set; }
+        public Guid SellerId { get; set; }
     }
 }

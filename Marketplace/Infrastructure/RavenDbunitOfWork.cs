@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using MarketPlace.Framework;
 using Raven.Client.Documents.Session;
 
-namespace Marketplace.Infrastructure
+namespace MarketPlace.Infrastructure
 {
     public class RavenDbUnitOfWork : IUnitOfWork
     {

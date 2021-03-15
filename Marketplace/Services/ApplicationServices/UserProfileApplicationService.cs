@@ -4,25 +4,25 @@ using MarketPlace.Domain.Interfaces;
 using MarketPlace.Framework;
 using MarketPlace.Domain.ValueObjects.UserProfile;
 using MarketPlace.Domain.ValueObjects;
+using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 using MarketPlace.Domain.Entities;
 
 
-namespace Marketplace.Api.ApplicationServices
+namespace MarketPlace.Services.ApplicationServices
 {
     public class UserProfileApplicationService : Interfaces.IApplicationService
     {
-        private readonly IUserProfileRepository _userProfileRepository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IAggregateStore _store;
+
         private readonly CheckTextForProfanity _checkText;
-        public UserProfileApplicationService(IUserProfileRepository userProfileRepository, IUnitOfWork unitOfWork, CheckTextForProfanity checkText)
+        public UserProfileApplicationService(IAggregateStore store, CheckTextForProfanity checkText)
         {
-            _unitOfWork = unitOfWork;
-            _userProfileRepository = userProfileRepository;
+            _store = store;
             _checkText = checkText;
         }
         private async Task HandleRegister(Contracts.UserProfile.RegisterUser cmd)
         {
-            if (await _userProfileRepository.Exists(cmd.UserId.ToString()))
+            if (await _store.Exists<UserProfile, UserId>(cmd.UserId.ToString()))
             {
                 throw new InvalidOperationException($"Entity with id {cmd.UserId} already exists");
             }
@@ -33,21 +33,10 @@ namespace Marketplace.Api.ApplicationServices
                 DisplayName.FromString(cmd.DisplayName, _checkText)
             );
 
-            await _userProfileRepository.Add(userProfile);
-            await _unitOfWork.Commit();
+            await _store.Save<UserProfile, UserId>(userProfile);
         }
         private async Task HandleUpdate(Guid userId, Action<UserProfile> operation)
-        {
-            var userProfile = await _userProfileRepository.Load(userId.ToString());
-            if (userProfile == null)
-            {
-                throw new InvalidOperationException($"Entity with id {userId} cannot be found");
-            }
-
-            operation(userProfile);
-
-            await _unitOfWork.Commit();
-        }
+            => await this.HandleUpdate(_store, new UserId(userId), operation);
         public Task Handle(object command) =>
             command switch
             {

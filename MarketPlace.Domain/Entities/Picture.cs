@@ -9,7 +9,7 @@ namespace MarketPlace.Domain.Entities
         public PictureSize Size { get; private set; }
         internal Uri Location { get; set; }
         internal int Order { get; set; }
-        public Guid PictureId { get => Id.Value; set{ } }
+        public Guid PictureId { get => Id.Value; set { } }
         public ClassfiedAdId ParentId { get; private set; }
         protected override void When(object @event)
         {

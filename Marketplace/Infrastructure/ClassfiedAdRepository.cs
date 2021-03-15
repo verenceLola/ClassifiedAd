@@ -4,7 +4,7 @@ using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 using MarketPlace.Framework;
 using Raven.Client.Documents.Session;
 
-namespace Marketplace.Infrastructure
+namespace MarketPlace.Infrastructure
 {
     public class ClassifiedAdRepository : RavenDBRepository<ClassfiedAd, ClassfiedAdId>, IClassifiedAdRepository
     {

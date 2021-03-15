@@ -1,6 +1,6 @@
 using System;
 
-namespace Marketplace.ReadModels.ClassifiedAds
+namespace MarketPlace.ReadModels.ClassifiedAds
 {
     public class PublicClassifiedAdListItem
     {

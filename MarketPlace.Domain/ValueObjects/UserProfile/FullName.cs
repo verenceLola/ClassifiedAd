@@ -9,7 +9,8 @@ namespace MarketPlace.Domain.ValueObjects.UserProfile
         internal FullName(string fullName) => Value = fullName;
         public static FullName FromString(string fullName)
         {
-            if (fullName.IsEmpty()){
+            if (fullName.IsEmpty())
+            {
                 throw new ArgumentNullException(nameof(fullName));
             }
 

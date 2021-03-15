@@ -1,11 +1,10 @@
 using System;
 
-namespace MarketPlace.Contracts.UserProfile
+namespace MarketPlace.ReadModels.UserDetails
 {
-    public class RegisterUser
+    public class UserDetails
     {
         public Guid UserId { get; set; }
-        public string FullName { get; set; }
         public string DisplayName { get; set; }
     }
 }

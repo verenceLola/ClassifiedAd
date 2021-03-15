@@ -8,7 +8,7 @@ namespace MarketPlace.Domain.ValueObjects.ClasifiedAd
     public class Money : Value<Money>
     {
         public decimal Amount { get; private set; }
-        public CurrencyDetails Currency { get; private set;}
+        public CurrencyDetails Currency { get; private set; }
         protected Money(decimal amount, string currencyCode, IcurrencyLookup currencyLookup)
         {
             if (string.IsNullOrEmpty(currencyCode))

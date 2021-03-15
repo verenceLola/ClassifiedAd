@@ -4,21 +4,18 @@ using MarketPlace.Domain.Services.Interfaces;
 using MarketPlace.Domain.Entities;
 using MarketPlace.Domain.ValueObjects;
 using MarketPlace.Domain.ValueObjects.ClasifiedAd;
-using MarketPlace.Domain.Interfaces;
 using MarketPlace.Framework;
 
-namespace Marketplace.Api.ApplicationServices
+namespace MarketPlace.Services.ApplicationServices
 {
     public class ClassfiedAdApplicationService : Interfaces.IApplicationService
     {
-        private readonly IClassifiedAdRepository _repository;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly IAggregateStore _store;
         private IcurrencyLookup _currencyLookup;
-        public ClassfiedAdApplicationService(IClassifiedAdRepository repository, IUnitOfWork unitOfWork, IcurrencyLookup currencyLookup)
+        public ClassfiedAdApplicationService(IAggregateStore store, IcurrencyLookup currencyLookup)
         {
             _currencyLookup = currencyLookup;
-            _unitOfWork = unitOfWork;
-            _repository = repository;
+            _store = store;
         }
         public Task Handle(object command) =>
             command switch
@@ -32,7 +29,7 @@ namespace Marketplace.Api.ApplicationServices
             };
         public async Task HandleCreate(Contracts.ClassifiedAds.V1.Create cmd)
         {
-            if (await _repository.Exists(cmd.Id.ToString()))
+            if (await _store.Exists<ClassfiedAd, ClassfiedAdId>(cmd.Id.ToString()))
             {
                 throw new InvalidOperationException($"Entity with id {cmd.Id} already exists");
             }
@@ -41,19 +38,9 @@ namespace Marketplace.Api.ApplicationServices
                 new UserId(cmd.OwnerId)
             );
 
-            await _repository.Add(classfiedAd);
-            await _unitOfWork.Commit();
+            await _store.Save<ClassfiedAd, ClassfiedAdId>(classfiedAd);
         }
         public async Task HandleUpdate(Guid classifiedAdId, Action<ClassfiedAd> operation)
-        {
-            var classfiedAd = await _repository.Load(classifiedAdId.ToString());
-            if (classfiedAd == null)
-            {
-                throw new InvalidOperationException($"Entity with id {classifiedAdId} cannot be found");
-            }
-            operation(classfiedAd);
-
-            await _unitOfWork.Commit();
-        }
+            => await this.HandleUpdate(_store, new ClassfiedAdId(classifiedAdId), operation);
     }
 }
