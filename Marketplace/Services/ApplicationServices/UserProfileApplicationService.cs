@@ -4,7 +4,6 @@ using MarketPlace.Domain.Interfaces;
 using MarketPlace.Framework;
 using MarketPlace.Domain.ValueObjects.UserProfile;
 using MarketPlace.Domain.ValueObjects;
-using MarketPlace.Domain.ValueObjects.ClasifiedAd;
 using MarketPlace.Domain.Entities;
 
 

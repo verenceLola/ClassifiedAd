@@ -1,7 +1,7 @@
 using System;
 
 
-namespace MarketPlace.Contracts.ClassifiedAds.V1
+namespace MarketPlace.Contracts.ClassifiedAds
 {
     public class Create
     {

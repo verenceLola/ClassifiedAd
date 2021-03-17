@@ -1,3 +1,4 @@
+using System;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
@@ -6,10 +7,14 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using MarketPlace.Services.ApplicationServices;
-using MarketPlace.Domain.Interfaces;
+using System.Linq;
 using MarketPlace.Domain.Services.Interfaces;
 using MarketPlace.Framework;
 using EventStore.ClientAPI;
+using Raven.Client.Documents;
+using Raven.Client.Documents.Session;
+using Raven.Client.ServerWide;
+using Raven.Client.ServerWide.Operations;
 
 
 namespace MarketPlace
@@ -36,18 +41,22 @@ namespace MarketPlace
             var store = new Infrastructure.EsAggregateStore(esConnection);
             var classfiedAdDetails = new List<ReadModels.ClassifiedAds.ClassfiedAdDetails>();
             var userDetails = new List<ReadModels.UserDetails.UserDetails>();
+            var documentStore = ConfigureRavenDB(Configuration.GetSection("ravenDB"));
+            Func<IAsyncDocumentSession> getSession = () => documentStore.OpenAsyncSession();
 
+            services.AddTransient(c => getSession());
             services.AddSingleton<IEnumerable<ReadModels.UserDetails.UserDetails>>(userDetails);
             services.AddSingleton<IEnumerable<ReadModels.ClassifiedAds.ClassfiedAdDetails>>(classfiedAdDetails);
             services.AddSingleton(esConnection);
             services.AddSingleton<IAggregateStore>(store);
 
-            IProjection[] projections = {
-                new Projections.ClassifiedAdDetailProjection(classfiedAdDetails),
-                new Projections.UserDetailsProjection(userDetails)
-            };
-
-            var projectionManager = new Infrastructure.ProjectionManager(esConnection, projections);
+            var projectionManager = new Infrastructure.ProjectionManager(esConnection,
+                new Infrastructure.RavenDBCheckpointStore(getSession, "readmodels"),
+                new Projections.ClassifiedAdDetailProjection(getSession,
+                    async userId => (await getSession.GetUserDetails(userId))?.DisplayName),
+                new Projections.UserDetailsProjection(getSession),
+                new Projections.ClassifiedAdUpcasters(esConnection, async userId => (await getSession.GetUserDetails(userId))?.PhotoUrl)
+            );
             services.AddSingleton<IHostedService>(new EventStoreService(esConnection, projectionManager));
             services.AddSingleton<IcurrencyLookup, Infrastructure.FixedCurrencyLookup>();
             services.AddScoped<Services.ApplicationServices.Interfaces.IApplicationService, ClassfiedAdApplicationService>();
@@ -73,6 +82,22 @@ namespace MarketPlace
             app.UseMvcWithDefaultRoute();
             app.UseSwagger();
             app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "ClassfiedAds v1"));
+        }
+        private static IDocumentStore ConfigureRavenDB(IConfiguration configuration)
+        {
+            var store = new DocumentStore
+            {
+                Urls = new[] { configuration["server"] },
+                Database = configuration["database"]
+            };
+            store.Initialize();
+            var record = store.Maintenance.Server.Send(new GetDatabaseRecordOperation(store.Database));
+            if (record == null)
+            {
+                store.Maintenance.Server.Send(new CreateDatabaseOperation(new DatabaseRecord(store.Database)));
+            }
+
+            return store;
         }
     }
 }

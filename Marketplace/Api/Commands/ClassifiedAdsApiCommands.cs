@@ -15,28 +15,33 @@ namespace MarketPlace.Api.ClassifiedAdsCommands
             _applicationService = applicationService;
         }
         [HttpPost]
-        public async Task<IActionResult> Post(Contracts.ClassifiedAds.V1.Create request) =>
+        public async Task<IActionResult> Post(Contracts.ClassifiedAds.Create request) =>
             await Infrastructure.RequestHandler.HandleRequest(request, _applicationService.Handle, Log);
 
         [Route("name")]
         [HttpPut]
-        public async Task<IActionResult> Put(Contracts.ClassifiedAds.V1.SetTitle request) =>
+        public async Task<IActionResult> Put(Contracts.ClassifiedAds.SetTitle request) =>
             await Infrastructure.RequestHandler.HandleRequest(request, _applicationService.Handle, Log);
 
         [Route("text")]
         [HttpPut]
-        public async Task<IActionResult> Put(Contracts.ClassifiedAds.V1.UpdateText request) =>
+        public async Task<IActionResult> Put(Contracts.ClassifiedAds.UpdateText request) =>
              await Infrastructure.RequestHandler.HandleRequest(request, _applicationService.Handle, Log);
 
         [Route("price")]
         [HttpPut]
-        public async Task<IActionResult> Put(Contracts.ClassifiedAds.V1.UpdatePrice request) =>
+        public async Task<IActionResult> Put(Contracts.ClassifiedAds.UpdatePrice request) =>
+             await Infrastructure.RequestHandler.HandleRequest(request, _applicationService.Handle, Log);
+
+        [Route("request to publish")]
+        [HttpPut]
+        public async Task<IActionResult> Put(Contracts.ClassifiedAds.RequestToPublish request) =>
              await Infrastructure.RequestHandler.HandleRequest(request, _applicationService.Handle, Log);
 
         [Route("publish")]
         [HttpPut]
-        public async Task<IActionResult> Put(Contracts.ClassifiedAds.V1.RequestToPublish request) =>
-             await Infrastructure.RequestHandler.HandleRequest(request, _applicationService.Handle, Log);
+        public async Task<IActionResult> Put(Contracts.ClassifiedAds.Publish request) =>
+            await Infrastructure.RequestHandler.HandleRequest(request, _applicationService.Handle, Log);
 
     }
 }

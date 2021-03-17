@@ -24,11 +24,11 @@ namespace MarketPlace.Infrastructure
                 return new BadRequestObjectResult(new { error = e.Message, stackTrace = e.StackTrace });
             }
         }
-        public static IActionResult HandleQuery<TModel>(Func<TModel> query, ILogger logger)
+        public static async Task<IActionResult> HandleQuery<TModel>(Func<Task<TModel>> query, ILogger logger)
         {
             try
             {
-                return new OkObjectResult(query());
+                return new OkObjectResult(await query());
             }
             catch (Exception e)
             {

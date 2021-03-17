@@ -20,14 +20,15 @@ namespace MarketPlace.Services.ApplicationServices
         public Task Handle(object command) =>
             command switch
             {
-                Contracts.ClassifiedAds.V1.Create cmd => HandleCreate(cmd),
-                Contracts.ClassifiedAds.V1.SetTitle cmd => HandleUpdate(cmd.Id, c => c.SetTitle(ClassfiedAdTitle.FromString(cmd.Title))),
-                Contracts.ClassifiedAds.V1.UpdateText cmd => HandleUpdate(cmd.Id, c => c.UpdateText(ClassfiedAdText.FromString(cmd.Text))),
-                Contracts.ClassifiedAds.V1.UpdatePrice cmd => HandleUpdate(cmd.Id, c => c.UpdatePrice(Price.FromDecimal(cmd.Price, cmd.Currency, _currencyLookup))),
-                Contracts.ClassifiedAds.V1.RequestToPublish cmd => HandleUpdate(cmd.Id, c => c.RequestToPublish()),
+                Contracts.ClassifiedAds.Create cmd => HandleCreate(cmd),
+                Contracts.ClassifiedAds.SetTitle cmd => HandleUpdate(cmd.Id, c => c.SetTitle(ClassfiedAdTitle.FromString(cmd.Title))),
+                Contracts.ClassifiedAds.UpdateText cmd => HandleUpdate(cmd.Id, c => c.UpdateText(ClassfiedAdText.FromString(cmd.Text))),
+                Contracts.ClassifiedAds.UpdatePrice cmd => HandleUpdate(cmd.Id, c => c.UpdatePrice(Price.FromDecimal(cmd.Price, cmd.Currency, _currencyLookup))),
+                Contracts.ClassifiedAds.RequestToPublish cmd => HandleUpdate(cmd.Id, c => c.RequestToPublish()),
+                Contracts.ClassifiedAds.Publish cmd => HandleUpdate(cmd.Id, c => c.Publish(new UserId(cmd.ApprovedBy))),
                 _ => Task.CompletedTask,
             };
-        public async Task HandleCreate(Contracts.ClassifiedAds.V1.Create cmd)
+        public async Task HandleCreate(Contracts.ClassifiedAds.Create cmd)
         {
             if (await _store.Exists<ClassfiedAd, ClassfiedAdId>(cmd.Id.ToString()))
             {

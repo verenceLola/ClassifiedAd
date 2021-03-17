@@ -16,7 +16,7 @@ namespace MarketPlace
         }
         public  async Task StartAsync(CancellationToken cancellationToken){
             await _eventStoreConnection.ConnectAsync();
-            _projectionManager.Start();
+            await _projectionManager.Start();
         }
         public Task StopAsync(CancellationToken cancellationToken)
         {

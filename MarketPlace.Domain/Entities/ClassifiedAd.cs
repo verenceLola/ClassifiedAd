@@ -57,13 +57,19 @@ namespace MarketPlace.Domain.Entities
         {
             Id = Id
         });
+        public void Publish(UserId userId) => Apply(new Events.ClassifiedAdEvents.ClassifiedAdPublished
+        {
+            Id = Id,
+            ApprovedBy = userId,
+            OwnerId = OwnerId
+        });
 
         protected override void EnsureValidState()
         {
             bool valid = Id != null && OwnerId != null && (State switch
             {
-                ClassifiedAdState.PendingReview => Title != null && Text != null && Price?.Amount > 0 && FirstPicture.HasCorrectSize(),
-                ClassifiedAdState.Active => Title != null && Text != null && Price?.Amount > 0 && FirstPicture.HasCorrectSize() && ApprovedBy != null,
+                ClassifiedAdState.PendingReview => Title != null && Text != null && Price?.Amount > 0 ,
+                ClassifiedAdState.Active => Title != null && Text != null && Price?.Amount > 0 && ApprovedBy != null,
                 _ => true
             });
 

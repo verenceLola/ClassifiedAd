@@ -12,5 +12,6 @@ namespace MarketPlace.ReadModels.ClassifiedAds
         public string SellerDisplayName { get; set; }
         public string[] PhotoUrls { get; set; }
         public Guid SellerId { get; set; }
+        public string SellerPhotoUrl { get; set; }
     }
 }

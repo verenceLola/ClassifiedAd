@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using EventStore.ClientAPI;
 using MarketPlace.Framework;
 using Newtonsoft.Json;
-using EventStore.ClientAPI.Common;
 
 namespace MarketPlace.Infrastructure
 {
@@ -29,24 +28,10 @@ namespace MarketPlace.Infrastructure
                 throw new ArgumentNullException(nameof(aggregate));
             }
 
-            var changes = aggregate.GetChanges()
-                .Select(@event => new EventData(
-                    eventId: Guid.NewGuid(),
-                    type: @event.GetType().Name,
-                    isJson: true,
-                    data: Serialize(@event),
-                    metadata: Serialize(
-                        new EventMetadata
-                        {
-                            ClrType = @event.GetType().AssemblyQualifiedName,
-                        }
-                    )
-                ))
-                .ToArray();
-            if (!changes.Any()) return;
+            var changes = aggregate.GetChanges().ToArray();
             var streamName = GetStreamName<T, Tid>(aggregate);
 
-            await _connection.AppendToStreamAsync(streamName, aggregate.Version, changes);
+            await _connection.AppendEvent(streamName, aggregate.Version, changes);
             aggregate.ClearChanges();
         }
         public async Task<T> Load<T, TId>(TId aggregateId) where T : AggregateRoot<TId>
@@ -70,10 +55,6 @@ namespace MarketPlace.Infrastructure
             var result = await _connection.ReadEventAsync(stream, 1, false);
 
             return result.Status != EventReadStatus.NoStream;
-        }
-        private class EventMetadata
-        {
-            public string ClrType { get; set; }
         }
     }
 }

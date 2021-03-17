@@ -2,42 +2,31 @@ using System;
 using System.Threading.Tasks;
 using System.Linq;
 using System.Collections.Generic;
-using MarketPlace.Framework;
+using Raven.Client.Documents.Session;
 using MarketPlace.Domain.Events.UserProfile;
 
 namespace MarketPlace.Projections
 {
-    public class UserDetailsProjection : IProjection
+    public class UserDetailsProjection : RavenDBProjection<ReadModels.UserDetails.UserDetails>
     {
-        List<ReadModels.UserDetails.UserDetails> _items;
-        public UserDetailsProjection(List<ReadModels.UserDetails.UserDetails> items)
-        {
-            _items = items;
-        }
-        public Task Project(object @event)
-        {
-            switch (@event)
+        public UserDetailsProjection(Func<IAsyncDocumentSession> getSession) : base(getSession) { }
+        public override Task Project(object @event) =>
+            @event switch
             {
-                case UserRegistered e:
-                    _items.Add(new ReadModels.UserDetails.UserDetails
-                    {
-                        UserId = e.UserId,
-                        DisplayName = e.DisplayName
-                    });
-                    break;
-                case UserDisplayNameUpdated e:
-                    UpdateItem(e.UserId, x => x.DisplayName = e.DisplayName);
-                    break;
-            }
+                UserRegistered e =>
+                    Create(() => Task.FromResult(
+                        new ReadModels.UserDetails.UserDetails
+                        {
+                            UserId = e.UserId,
+                            DisplayName = e.DisplayName
+                        }
+                    )),
+                UserDisplayNameUpdated e =>
+                    UpdateOne(e.UserId, x => x.DisplayName = e.DisplayName),
+                ProfilePhotoUploaded e =>
+                    UpdateOne(e.UserId, x => x.PhotoUrl = e.PhotoUrl),
+                _ => Task.CompletedTask
 
-            return Task.CompletedTask;
+            };
         }
-        private void UpdateItem(Guid id, Action<ReadModels.UserDetails.UserDetails> update)
-        {
-            var item = _items.FirstOrDefault(x => x.UserId == id);
-            if (item == null) return;
-
-            update(item);
-        }
-    }
 }

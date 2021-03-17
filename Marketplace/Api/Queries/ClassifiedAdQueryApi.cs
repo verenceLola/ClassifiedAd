@@ -1,8 +1,8 @@
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
-using System.Collections.Generic;
 using Serilog;
+using Raven.Client.Documents.Session;
 
 
 namespace MarketPlace.Api.Queries
@@ -10,24 +10,24 @@ namespace MarketPlace.Api.Queries
     [Route("/ad")]
     public class ClassifiedAdQueryApi : Controller
     {
-        private readonly IEnumerable<ReadModels.ClassifiedAds.ClassfiedAdDetails> _items;
+        private readonly IAsyncDocumentSession _session;
         private static ILogger _log = Log.ForContext<ClassifiedAdQueryApi>();
-        public ClassifiedAdQueryApi(IEnumerable<ReadModels.ClassifiedAds.ClassfiedAdDetails> items)
+        public ClassifiedAdQueryApi(IAsyncDocumentSession session)
         {
-            _items = items;
+            _session = session;
         }
         // [HttpGet]
         // [Route("list")]
         // public Task<IActionResult> Get(QueryModels.GetPublishedClassifiedAds request)
-        //     => Infrastructure.RequestHandler.HandleQuery(() => _items.Query(request), _log);
+        //     => Infrastructure.RequestHandler.HandleQuery(() => _session.Query(request), _log);
         // [HttpGet]
         // [Route("myads")]
         // public Task<IActionResult> Get(QueryModels.GetOwnersClassifiedAds request)
-        //     => Infrastructure.RequestHandler.HandleQuery(() => _items.Query(request), _log);
+        //     => Infrastructure.RequestHandler.HandleQuery(() => _session.Query<QueryModels.GetOwnersClassifiedAds>(request), _log);
         [HttpGet]
         [ProducesResponseType((int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(QueryModels.GetPublicClassifiedAd request)
-             => Infrastructure.RequestHandler.HandleQuery(() => _items.Query(request), _log);
+        public Task<IActionResult> Get(QueryModels.GetPublicClassifiedAd request)
+             => Infrastructure.RequestHandler.HandleQuery(() => _session.Query<QueryModels.GetPublicClassifiedAd>(request), _log);
     }
 }
