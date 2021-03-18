@@ -5,10 +5,10 @@ namespace MarketPlace
 {
     public static class Queries
     {
-        public static Task<T> Query<T>(
+        public static Task<ReadModels.ClassifiedAds.ClassfiedAdDetails> Query<T>(
             this IAsyncDocumentSession session,
             QueryModels.GetPublicClassifiedAd query
         )
-            => session.LoadAsync<T>(query.ClassifiedAdId.ToString());
+            => session.LoadAsync<ReadModels.ClassifiedAds.ClassfiedAdDetails>(query.ClassifiedAdId.ToString());
     }
 }

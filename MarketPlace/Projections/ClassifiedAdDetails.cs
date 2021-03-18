@@ -26,7 +26,8 @@ namespace MarketPlace.Projections
                 {
                     ClassifiedAdId = e.Id,
                     SellerId = e.OwnerId,
-                    SellerDisplayName = await _getUserDisplayName(e.OwnerId)
+                    SellerDisplayName = await _getUserDisplayName(e.OwnerId),
+                    Id = e.Id.ToString()
                 }),
             ClassifiedAdTitleChanged e =>
                 UpdateOne(e.Id, ad => ad.Title = e.Title),

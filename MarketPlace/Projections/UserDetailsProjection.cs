@@ -18,7 +18,8 @@ namespace MarketPlace.Projections
                         new ReadModels.UserDetails.UserDetails
                         {
                             UserId = e.UserId,
-                            DisplayName = e.DisplayName
+                            DisplayName = e.DisplayName,
+                            Id = e.UserId.ToString()
                         }
                     )),
                 UserDisplayNameUpdated e =>

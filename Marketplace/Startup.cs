@@ -7,6 +7,7 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
 using System.Collections.Generic;
 using MarketPlace.Services.ApplicationServices;
+using System.Threading.Tasks;
 using MarketPlace.Domain.Services.Interfaces;
 using MarketPlace.Framework;
 using EventStore.ClientAPI;
@@ -89,6 +90,14 @@ namespace MarketPlace
                 Urls = new[] { configuration["server"] },
                 Database = configuration["database"]
             };
+
+            store.Conventions.RegisterAsyncIdConvention<ReadModels.ClassifiedAds.ClassfiedAdDetails>(
+                (dbName, detail) => Task.FromResult(string.Format("ClassfiedAdDetails/{0}", detail.ClassifiedAdId))
+            );
+            store.Conventions.RegisterAsyncIdConvention<ReadModels.UserDetails.UserDetails>(
+                (dbName, detail) => Task.FromResult(string.Format("UserDetail/{0}", detail.UserId))
+            );
+
             store.Initialize();
             var record = store.Maintenance.Server.Send(new GetDatabaseRecordOperation(store.Database));
             if (record == null)
