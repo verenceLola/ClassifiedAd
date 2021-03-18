@@ -7,14 +7,14 @@ namespace MarketPlace
 {
     public static class UserProfileQueries
     {
-        public static Task<ReadModels.UserDetails.UserDetails> GetUserDetails(
+        public static async Task<ReadModels.UserDetails.UserDetails> GetUserDetails(
             this Func<IAsyncDocumentSession> getSession,
             Guid id
         )
         {
             using var sesion = getSession();
 
-            return sesion.LoadAsync<ReadModels.UserDetails.UserDetails>(id.ToString());
+            return await sesion.LoadAsync<ReadModels.UserDetails.UserDetails>(id.ToString());
         }
     }
 }
